@@ -65,7 +65,7 @@ if (typeof plxDwnld === "undefined") {
 						if (metadataId && metadataId.length == 2) {
 							getXml(apiLibraryUrl.replace('{baseuri}', baseUri).replace('{id}', metadataId[1]).replace('{token}', accessToken), getDownloadUrl, baseUri);
 						} else {
-							alert("You are currently not viewing a media item.");
+							// alert("You are currently not viewing a media item.");
 						}
 					
 					   // alert(thisHeading.textContent);
@@ -78,7 +78,7 @@ if (typeof plxDwnld === "undefined") {
 					
 					
                 } else {
-                    alert("Cannot find a valid accessToken.");
+                    // alert("Cannot find a valid accessToken.");
                 }
 				
 				
@@ -105,7 +105,7 @@ if (typeof plxDwnld === "undefined") {
 				
 				
             } else {
-                alert("You are currently not viewing a media item.");
+               // alert("You are currently not viewing a media item.");
             }
         };
 
@@ -156,7 +156,7 @@ if (typeof plxDwnld === "undefined") {
 				
 				
             } else {
-                alert("You are currently not viewing a media item.");
+                // alert("You are currently not viewing a media item.");
             }
         };
 		const injectButton = function(url) {
@@ -216,4 +216,3 @@ function injectionWrapper() {
 
 window.addEventListener("hashchange", injectionWrapper, false);
 injectionWrapper();
-
