@@ -37,7 +37,8 @@ if (typeof plxDwnld === "undefined") {
                     baseUri = baseUriNode.singleNodeValue.textContent;
                     const metadataId = metadataIdRegex.exec(window.location.href);
 
-					// alert(apiLibraryUrl.replace('{baseuri}', baseUri).replace('{id}', metadataId[1]).replace('{token}', accessToken));
+					alert(apiLibraryUrl.replace('{baseuri}', baseUri).replace('{id}', metadataId[1]).replace('{token}', accessToken));
+					
                     if (metadataId && metadataId.length == 2) {
                         getXml(apiLibraryUrl.replace('{baseuri}', baseUri).replace('{id}', metadataId[1]).replace('{token}', accessToken), getDownloadUrl);
                     } else {
@@ -125,6 +126,7 @@ if (typeof plxDwnld === "undefined") {
 
         self.init = function() {
             if (typeof localStorage.myPlexAccessToken != "undefined") {
+				// alert(apiResourceUrl.replace('{token}', localStorage.myPlexAccessToken));
                 getXml(apiResourceUrl.replace('{token}', localStorage.myPlexAccessToken), getMetadata);
             } else {
                 alert("You are currently not browsing or logged into a Plex web environment.");
