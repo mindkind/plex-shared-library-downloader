@@ -216,3 +216,4 @@ function injectionWrapper() {
 
 window.addEventListener("hashchange", injectionWrapper, false);
 injectionWrapper();
+
