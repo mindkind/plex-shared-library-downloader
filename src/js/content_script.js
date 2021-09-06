@@ -11,16 +11,23 @@ if (typeof plxDwnld === "undefined") {
         const apiLibraryUrl = "{baseuri}/library/metadata/{id}?X-Plex-Token={token}";
         const downloadUrl = "{baseuri}{partkey}?X-Plex-Token={token}";
         const accessTokenXpath = "//Device[@clientIdentifier='{clientid}']/@accessToken";
-        const baseUriXpath = "//Device[@clientIdentifier='{clientid}']/Connection[@local='0']/@uri";
+        const baseUriXpath = "//Device[@clientIdentifier='{clientid}']/Connection[@local='0']/@uri"; // 
         const partKeyXpath = "//Media/Part[1]/@key";
         let accessToken = null;
         let baseUri = null;
-
-        const getXml = function(url, callback) {
+		
+        const getXml = function(url, callback, base = null) {
             const request = new XMLHttpRequest();
             request.onreadystatechange = function() {
                 if (request.readyState == 4 && request.status == 200) {
-                    callback(request.responseXML);
+					// console.error(request.responseXML);
+					
+					if (base) {
+						callback(request.responseXML, base);
+					}
+					else {
+						callback(request.responseXML);
+					}
                 }
             };
             request.open("GET", url);
@@ -30,8 +37,55 @@ if (typeof plxDwnld === "undefined") {
         const getMetadata = function(xml) {
             const clientId = clientIdRegex.exec(window.location.href);
             if (clientId && clientId.length == 2) {
+				
+				
+				
                 const accessTokenNode = xml.evaluate(accessTokenXpath.replace('{clientid}', clientId[1]), xml, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null);
-				const baseUriNode = xml.evaluate(baseUriXpath.replace('{clientid}', clientId[1]), xml, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null);
+				// const baseUriNode = xml.evaluate(baseUriXpath.replace('{clientid}', clientId[1]), xml, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null);
+
+
+				 
+                if (accessTokenNode.singleNodeValue) {
+                    accessToken = accessTokenNode.singleNodeValue.textContent;
+					
+					
+					var headings = xml.evaluate(baseUriXpath.replace('{clientid}', clientId[1]), xml, null, XPathResult.ANY_TYPE, null);
+					/* Search the document for all h2 elements.
+					 * The result will likely be an unordered node iterator. */
+					var thisHeading = headings.iterateNext();
+					// var alertText = "Level 2 headings in this document are:\n";
+					while (thisHeading) {
+						
+						
+						baseUri = thisHeading.textContent;
+						const metadataId = metadataIdRegex.exec(window.location.href);
+
+						// alert(apiLibraryUrl.replace('{baseuri}', baseUri).replace('{id}', metadataId[1]).replace('{token}', accessToken));
+						
+						if (metadataId && metadataId.length == 2) {
+							getXml(apiLibraryUrl.replace('{baseuri}', baseUri).replace('{id}', metadataId[1]).replace('{token}', accessToken), getDownloadUrl, baseUri);
+						} else {
+							alert("You are currently not viewing a media item.");
+						}
+					
+					   // alert(thisHeading.textContent);
+					   thisHeading = headings.iterateNext();
+					   
+					}		
+
+					
+
+					
+					
+                } else {
+                    alert("Cannot find a valid accessToken.");
+                }
+				
+				
+				
+			
+			/*
+				
                 if (accessTokenNode.singleNodeValue && baseUriNode.singleNodeValue) {
                     accessToken = accessTokenNode.singleNodeValue.textContent;
                     baseUri = baseUriNode.singleNodeValue.textContent;
@@ -47,12 +101,15 @@ if (typeof plxDwnld === "undefined") {
                 } else {
                     alert("Cannot find a valid accessToken.");
                 }
+			*/
+				
+				
             } else {
                 alert("You are currently not viewing a media item.");
             }
         };
 
-        const getDownloadUrl = function(xml) {
+        const getDownloadUrl = function(xml, base) {
             const partKeyNode = xml.evaluate(partKeyXpath, xml, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null);
 
 /*
@@ -93,7 +150,7 @@ if (typeof plxDwnld === "undefined") {
 */			
             if (partKeyNode.singleNodeValue) {
 
-				injectButton(downloadUrl.replace('{baseuri}', baseUri).replace('{partkey}', partKeyNode.singleNodeValue.textContent).replace('{token}', accessToken));
+				injectButton(downloadUrl.replace('{baseuri}', base).replace('{partkey}', partKeyNode.singleNodeValue.textContent).replace('{token}', accessToken));
 
                 // window.location.href = downloadUrl.replace('{baseuri}', baseUri).replace('{partkey}', partKeyNode.singleNodeValue.textContent).replace('{token}', accessToken);			
 				
