@@ -12,17 +12,17 @@
 
 if (typeof plxDwnld === "undefined") {
 
-    window.plxDwnld = (function() {
+	window.plxDwnld = (function() {
 
         const self = {};
         const clientIdRegex = new RegExp("server\/([a-f0-9]{40})\/");
         const metadataIdRegex = new RegExp("key=%2Flibrary%2Fmetadata%2F(\\d+)");
         const apiResourceUrl = "https://plex.tv/api/resources?includeHttps=1&X-Plex-Token={token}";
         const apiLibraryUrl = "{baseuri}/library/metadata/{id}?X-Plex-Token={token}";
-        const downloadUrl = "{baseuri}{partkey}?download=1&X-Plex-Token={token}";
-        const accessTokenXpath = "https://device[@clientIdentifier='{clientid}']/@accessToken";
-        const baseUriXpath = "https://device[@clientIdentifier='{clientid}']/Connection[@local='0']/@uri";
-        const partKeyXpath = "https://media/Part[1]/@key";
+        const downloadUrl = "{baseuri}{partkey}?X-Plex-Token={token}";
+        const accessTokenXpath = "//Device[@clientIdentifier='{clientid}']/@accessToken";
+        const baseUriXpath = "//Device[@clientIdentifier='{clientid}']/Connection[@local='0']/@uri";
+        const partKeyXpath = "//Media/Part[1]/@key";
         let accessToken = null;
         let baseUri = null;
 
@@ -39,11 +39,9 @@ if (typeof plxDwnld === "undefined") {
 
         const getMetadata = function(xml) {
             const clientId = clientIdRegex.exec(window.location.href);
-
             if (clientId && clientId.length == 2) {
                 const accessTokenNode = xml.evaluate(accessTokenXpath.replace('{clientid}', clientId[1]), xml, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null);
-                const baseUriNode = xml.evaluate(baseUriXpath.replace('{clientid}', clientId[1]), xml, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null);
-
+				const baseUriNode = xml.evaluate(baseUriXpath.replace('{clientid}', clientId[1]), xml, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null);
                 if (accessTokenNode.singleNodeValue && baseUriNode.singleNodeValue) {
                     accessToken = accessTokenNode.singleNodeValue.textContent;
                     baseUri = baseUriNode.singleNodeValue.textContent;
@@ -83,5 +81,4 @@ if (typeof plxDwnld === "undefined") {
         return self;
     })();
 }
-
 plxDwnld.init();
