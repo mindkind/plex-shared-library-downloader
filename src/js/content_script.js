@@ -54,14 +54,17 @@ if (typeof plxDwnld === "undefined") {
 
                 if (Metadata.type === 'movie' || Metadata.type === 'episode') {
 
+					
+					
+					
                     Metadata.Media.forEach(function(Media) {
 
                         let videoResolution = Media.videoResolution;
                         let bitrate = bitRate(Media.bitrate);
 
-						// console.error(Media);
+						let title;
+						let filename;
 
-						
 
                         if (videoResolution.match(/\D/) == null) {
                             videoResolution += "p";
@@ -74,15 +77,34 @@ if (typeof plxDwnld === "undefined") {
 							+ "<br>" + document.querySelectorAll('[data-testid="preplay-secondTitle"]')[0].innerHTML;
 						*/
 						
+						if (Metadata.type === 'episode') {
+							title = [Metadata.grandparentTitle , "S" + ('0' + Metadata.parentIndex).slice(-2) + "E" + ('0' + Metadata.index).slice(-2), Metadata.title].join(" - ").replace('&', 'and').replace(/[&\/\\#,+()$~%.":*?<>{}]/g, ' ').replace(/\s+/g, ' ').trim();
+						}	
+						else {
+							title = Metadata.title.replace('&', 'and').replace(/[&\/\\#,+()$~%.":*?<>{}]/g, ' ').replace(/\s+/g, ' ').trim();
+						}		
+						
+						
                         Media.Part.forEach(function(Part) {
 
-                            let size = niceBytes(Part.size);
+                            let size = niceBytes(Part.size);														
 							
+							
+							if (Metadata.type === 'episode') {
+								filename = Part.key.replace("file", [title, videoResolution, Media.videoCodec.toUpperCase().replace("H264","x264")].join('.'));
+
+							}	
+							else {
+								filename = Part.key.replace("file", [title, Metadata.year, videoResolution, Media.videoCodec.toUpperCase().replace("H264","x264")].join('.'));
+							}		
+						
+							
+							let dwlUrl = [Dev.serverUrl, filename, "?X-Plex-Token=", Dev.accessToken].join("");
 							
 							if (Dev.relay == true) {								
-								document.querySelectorAll('[data-qa-url="' + Dev.serverUrl + '"] .dropdown-menu')[0].innerHTML += '<li><a style="padding: 4px 20px;font-size: 13px;" target="_blank" href="' + [Dev.serverUrl, Part.key.replace("file", [Metadata.title.split(' ').join('.'), Metadata.year, videoResolution, Media.videoCodec.toUpperCase().replace("H264","x264")].join('.')), "?download=1&X-Plex-Token=", Dev.accessToken].join("") + '" download="test.mkv"><span class="dropdown-truncated-label">' + [bitrate, ", ", videoResolution, ", ", size].join("") + '</span></a></li>';
+								document.querySelectorAll('[data-qa-url="' + Dev.serverUrl + '"] .dropdown-menu')[0].innerHTML += '<li><a style="padding: 4px 20px;font-size: 13px;" target="_blank" href="' + dwlUrl + '" download="test.mkv"><span class="dropdown-truncated-label">' + [bitrate, ", ", videoResolution, ", ", size].join("") + '</span></a></li>';
 							} else {
-								document.querySelectorAll('[data-qa-url="' + Dev.serverUrl + '"] .dropdown-menu')[0].innerHTML += '<li><a style="padding: 4px 20px;font-size: 13px;" target="_blank" href="' + [Dev.serverUrl, Part.key.replace("file", [Metadata.title.split(' ').join('.'), Metadata.year, videoResolution, Media.videoCodec.toUpperCase().replace("H264","x264")].join('.')), "?X-Plex-Token=", Dev.accessToken].join("") + '" download="test.mkv"><span class="dropdown-truncated-label">' + [bitrate, ", ", videoResolution, ", ", size].join("") + '</span></a></li>';
+								document.querySelectorAll('[data-qa-url="' + Dev.serverUrl + '"] .dropdown-menu')[0].innerHTML += '<li><a style="padding: 4px 20px;font-size: 13px;" target="_blank" href="' + dwlUrl + '" download="test.mkv"><span class="dropdown-truncated-label">' + [bitrate, ", ", videoResolution, ", ", size].join("") + '</span></a></li>';
 							}							
 /*						
 							*/
@@ -92,6 +114,7 @@ if (typeof plxDwnld === "undefined") {
 
 							// const session = "{baseuri}&X-Plex-Client-Identifier={machineid}&X-Plex-Token={token}";
 							
+							/*
 							const session = "{baseuri}/video/:/transcode/universal/start.m3u8?protocol=hls&hasMDE=1&session={session}&X-Plex-Token={token}&path=%2Flibrary%2Fmetadata%2F{id}{extra}&addDebugOverlay=0&subtitles=burn&X-Plex-Client-Profile-Extra=add-limitation%28scope%3DvideoCodec%26scopeName%3D%2A%26type%3DupperBound%26name%3Dvideo.height%26value%3D1280%26replace%3Dtrue%29%2Badd-limitation%28scope%3DvideoCodec%26scopeName%3D%2A%26type%3DupperBound%26name%3Dvideo.bitrate%26value%3D4000%26replace%3Dtrue%29%2Bappend-transcode-target-codec%28type%3DvideoProfile%26context%3Dstreaming%26audioCodec%3Daac%26protocol%3Dhls%29&X-Plex-Incomplete-Segments=1&X-Plex-Product=Plex%20Web&X-Plex-Version=4.65.0&X-Plex-Client-Identifier=s4cr93pq4ml4w6li6gsc6984&X-Plex-Platform=Chrome&X-Plex-Platform-Version=92.0&X-Plex-Sync-Version=2&X-Plex-Features=external-media%2Cindirect-media&X-Plex-Model=hosted&X-Plex-Device=Windows&X-Plex-Device-Name=Chrome&X-Plex-Device-Screen-Resolution=1920x259%2C1920x1080&X-Plex-Language=en";
 // &offset=0&copyts=1
 							console.error(
@@ -101,7 +124,7 @@ if (typeof plxDwnld === "undefined") {
 								.replace('{session}','by2jo9rzolb75e39xmgifvp0')
 							);
 							
-							
+							*/
 
 
                         });
