@@ -164,14 +164,15 @@ if (typeof plxDwnld === "undefined") {
 						
 						if (typeof data.MediaContainer.Metadata[0].Media !== "undefined") {					
 							dropDownMenu(Dev);
+							getMediaInfo(data, Dev);
+
+
+							if (Dev.relay == false) {
+								window.Remote = true;
+							}							
 						}
 						
-						getMediaInfo(data, Dev);
 
-
-                        if (Dev.relay == false) {
-                            window.Remote = true;
-                        }
                     }
 
                 }
